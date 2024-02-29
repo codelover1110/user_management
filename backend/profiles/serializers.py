@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import UserProfile
-from .utils import is_valid_cell_phone
+from .utils import validate_and_classify_phone_number
 
 class UserProfileSerializer(serializers.ModelSerializer):
     """
@@ -15,7 +15,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
         """
         Custom validation for the 'phone_number' field using the utility function.
         """
-        if not is_valid_cell_phone(value):
-            raise serializers.ValidationError('Invalid phone number. Please enter a valid cell phone number.')
+        is_valid, classification = validate_and_classify_phone_number(value)
+
+        if not is_valid:
+            raise serializers.ValidationError(
+                f'Invalid phone number. The provided number is classified as "{classification}".'
+            )
 
         return value

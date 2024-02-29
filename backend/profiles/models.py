@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from .utils import is_valid_cell_phone
+from .utils import validate_and_classify_phone_number
 
 class UserProfile(models.Model):
     """
@@ -34,9 +34,11 @@ class UserProfile(models.Model):
         """
         Custom validation for the 'phone_number' field using the utility function.
         """
-        if not is_valid_cell_phone(self.phone_number):
+        is_valid, classification = validate_and_classify_phone_number(self.phone_number)
+
+        if not is_valid:
             # Raise validation error if the phone number is not valid
             raise ValidationError(
-                _('Invalid phone number. Please enter a valid cell phone number.'),
+                _(f'Invalid phone number. The provided number is classified as "{classification}".'),
                 code='invalid_phone_number'
             )
