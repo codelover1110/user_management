@@ -1,22 +1,37 @@
-# views.py
 from rest_framework import generics, status, serializers
 from rest_framework.response import Response
 from .models import UserProfile
 from .serializers import UserProfileSerializer
 
 class BaseUserProfileView(generics.GenericAPIView):
+    """
+    Base class for user profile views containing common functionality.
+    """
+
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
 
     def extract_error_message(self, e):
+        """
+        Extracts the first error message string from any key in ErrorDetail.
+
+        Args:
+            e: The exception.
+
+        Returns:
+            str: Extracted error message.
+        """
         if isinstance(e, serializers.ValidationError) and e.detail:
-            # Extract the first error message string from any key in ErrorDetail
             for key, value in e.detail.items():
                 if isinstance(value, list) and value:
                     return value[0]
         return str(e)
 
 class UserProfileListCreateView(BaseUserProfileView, generics.ListCreateAPIView):
+    """
+    Handles listing all user profiles and creating a new user profile.
+    """
+
     def get(self, request, *args, **kwargs):
         try:
             # Handle GET request to list all user profiles
@@ -46,6 +61,10 @@ class UserProfileListCreateView(BaseUserProfileView, generics.ListCreateAPIView)
             return Response({'error': error_message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserProfileDetailView(BaseUserProfileView, generics.RetrieveUpdateDestroyAPIView):
+    """
+    Handles retrieving, updating, and deleting a specific user profile.
+    """
+
     def get(self, request, *args, **kwargs):
         try:
             # Handle GET request to retrieve details of a specific user profile

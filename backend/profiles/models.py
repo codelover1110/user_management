@@ -4,6 +4,10 @@ from django.utils.translation import gettext_lazy as _
 from .utils import is_valid_cell_phone
 
 class UserProfile(models.Model):
+    """
+    Model representing user profiles.
+    """
+
     # Fields for user profile information
     first_name = models.CharField(max_length=100)
     surname = models.CharField(max_length=100)
@@ -14,16 +18,22 @@ class UserProfile(models.Model):
         app_label = 'profiles'
 
     def __str__(self):
-        # String representation of the user profile
+        """
+        String representation of the user profile.
+        """
         return f"{self.first_name} {self.surname}"
     
     def clean(self):
-        # Override the clean method to perform additional validation
+        """
+        Override the clean method to perform additional validation.
+        """
         super().clean()
         self.validate_phone_number()
 
     def validate_phone_number(self):
-        # Custom validation using the utility function
+        """
+        Custom validation for the 'phone_number' field using the utility function.
+        """
         if not is_valid_cell_phone(self.phone_number):
             # Raise validation error if the phone number is not valid
             raise ValidationError(
